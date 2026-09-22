@@ -4,6 +4,7 @@ const mobileMenu = document.querySelector('#mobile-menu');
 menuButton?.addEventListener('click', () => {
   const isOpen = menuButton.getAttribute('aria-expanded') === 'true';
   menuButton.setAttribute('aria-expanded', String(!isOpen));
+  menuButton.setAttribute('aria-label', isOpen ? 'Open menu' : 'Close menu');
   mobileMenu.hidden = isOpen;
 });
 
@@ -11,15 +12,79 @@ mobileMenu?.addEventListener('click', event => {
   if (event.target.matches('a')) {
     mobileMenu.hidden = true;
     menuButton.setAttribute('aria-expanded', 'false');
+    menuButton.setAttribute('aria-label', 'Open menu');
   }
 });
 
-document.querySelectorAll('.accordion details').forEach(item => {
+const navDropdowns = [...document.querySelectorAll('.nav-dropdown')];
+function closeNavigation() {
+  navDropdowns.forEach(item => { item.open = false; });
+  mobileMenu.hidden = true;
+  menuButton.setAttribute('aria-expanded', 'false');
+  menuButton.setAttribute('aria-label', 'Open menu');
+}
+navDropdowns.forEach(item => {
   item.addEventListener('toggle', () => {
-    if (!item.open) return;
-    document.querySelectorAll('.accordion details').forEach(other => {
-      if (other !== item) other.open = false;
-    });
+    if (item.open) navDropdowns.forEach(other => { if (other !== item) other.open = false; });
+  });
+});
+document.addEventListener('click', event => {
+  if (!event.target.closest('.site-header, .mobile-menu')) closeNavigation();
+});
+document.addEventListener('keydown', event => {
+  if (event.key !== 'Escape') return;
+  const openDropdown = navDropdowns.find(item => item.open);
+  if (openDropdown) openDropdown.querySelector('summary').focus();
+  else if (!mobileMenu.hidden) menuButton.focus();
+  closeNavigation();
+});
+window.matchMedia('(min-width: 1400px)').addEventListener('change', closeNavigation);
+
+const faqItems = [...document.querySelectorAll('.accordion details')];
+const faqAnimations = new WeakMap();
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+function setFaqOpen(item, shouldOpen, animate = true) {
+  const answer = item.querySelector('p');
+  faqAnimations.get(item)?.cancel();
+
+  if (!animate || reduceMotion.matches) {
+    item.open = shouldOpen;
+    return;
+  }
+
+  if (shouldOpen) item.open = true;
+  const answerHeight = answer.scrollHeight;
+  const frames = shouldOpen
+    ? [
+        { height: '0px', marginBottom: '0px', opacity: 0 },
+        { height: `${answerHeight}px`, marginBottom: '26px', opacity: 1 }
+      ]
+    : [
+        { height: `${answerHeight}px`, marginBottom: '26px', opacity: 1 },
+        { height: '0px', marginBottom: '0px', opacity: 0 }
+      ];
+  const animation = answer.animate(frames, {
+    duration: 280,
+    easing: 'cubic-bezier(.4, 0, .2, 1)'
+  });
+  faqAnimations.set(item, animation);
+  animation.onfinish = () => {
+    if (!shouldOpen) item.open = false;
+    faqAnimations.delete(item);
+  };
+}
+
+faqItems.forEach(item => {
+  item.querySelector('summary').addEventListener('click', event => {
+    event.preventDefault();
+    const shouldOpen = !item.open;
+    if (shouldOpen) {
+      faqItems.forEach(other => {
+        if (other !== item && other.open) setFaqOpen(other, false);
+      });
+    }
+    setFaqOpen(item, shouldOpen);
   });
 });
 
@@ -44,18 +109,59 @@ const quizResult = document.querySelector('#quiz-result');
 const questionCount = document.querySelector('#question-count');
 const questionText = document.querySelector('#question-text');
 const progress = document.querySelector('#quiz-progress');
+const quizBack = document.querySelector('#quiz-back');
 
 const questions = [
-  'Do you have a cat or dog in your household?',
-  'Are there small children in the household who might be curious about kittens?',
-  'Are you balancing a full-time job at the moment?',
-  'Do you have your own car and a valid driver’s license to be able to transport them safely and quickly to the veterinarian when needed?',
-  'Do you live within one hour of the shelter to ensure timely pickups, checkups, and emergency support when kittens need it most?',
-  'In the case of illness, are you willing to drive to the veterinarian at any time, day or night?',
-  'Are you ready to open your home and foster 3–6 kittens at a time?',
-  'Are you prepared to wake up every 2–4 hours (even through the night) for up to 5 weeks to bottle-feed kittens?',
-  'Do you feel prepared to support newborn kittens with frequent, hands-on care?',
-  'Are you comfortable committing to this life-saving work as a volunteer?'
+  {
+    text: 'Does a cat or dog currently live in your household?',
+    qualifyingAnswer: 'no',
+    reason: 'The foster kittens need a home without other cats or dogs during this programme.'
+  },
+  {
+    text: 'Are there young children living in your household?',
+    qualifyingAnswer: 'no',
+    reason: 'The kittens need a calm environment without small children during their most vulnerable weeks.'
+  },
+  {
+    text: 'Do you currently work full-time?',
+    qualifyingAnswer: 'no',
+    reason: 'Bottle-fed kittens need frequent care throughout the day, which is difficult alongside a full-time schedule.'
+  },
+  {
+    text: 'Do you have your own car and a valid driver’s licence?',
+    qualifyingAnswer: 'yes',
+    reason: 'You need access to your own car and a valid driver’s licence for veterinary visits and emergencies.'
+  },
+  {
+    text: 'Do you live within one hour’s drive of the shelter?',
+    qualifyingAnswer: 'yes',
+    reason: 'Foster families need to live within one hour of the shelter.'
+  },
+  {
+    text: 'Could you drive the kittens to a veterinarian at any time, including at night?',
+    qualifyingAnswer: 'yes',
+    reason: 'You must be able to take the kittens to a veterinarian at any time in an emergency.'
+  },
+  {
+    text: 'Could you foster a group of 3–6 kittens at the same time?',
+    qualifyingAnswer: null,
+    reason: ''
+  },
+  {
+    text: 'Could you bottle-feed kittens every 2–4 hours, including overnight, for up to five weeks?',
+    qualifyingAnswer: null,
+    reason: ''
+  },
+  {
+    text: 'Are you comfortable providing frequent, hands-on care for newborn kittens?',
+    qualifyingAnswer: 'yes',
+    reason: 'Newborn kittens require frequent, hands-on care and close monitoring.'
+  },
+  {
+    text: 'Are you willing to commit to fostering as a volunteer?',
+    qualifyingAnswer: 'yes',
+    reason: 'The foster programme is volunteer-based and requires a reliable commitment.'
+  }
 ];
 
 let currentQuestion = 0;
@@ -65,7 +171,8 @@ function renderQuestion() {
   quizResult.hidden = true;
   quizContent.hidden = false;
   questionCount.textContent = `${currentQuestion + 1}/10`;
-  questionText.textContent = questions[currentQuestion];
+  questionText.textContent = questions[currentQuestion].text;
+  quizBack.hidden = currentQuestion === 0;
   progress.replaceChildren(...questions.map((_, index) => {
     const step = document.createElement('span');
     if (index <= currentQuestion) step.className = 'done';
@@ -74,7 +181,10 @@ function renderQuestion() {
 }
 
 function showResult() {
-  const isMatch = answers.slice(3).every(answer => answer === 'yes');
+  const isMatch = answers.every(Boolean);
+  const failedReasons = questions
+    .filter((_, index) => answers[index] === false)
+    .map(question => question.reason);
   quizContent.hidden = true;
   quizResult.hidden = false;
   quizResult.classList.toggle('is-match', isMatch);
@@ -93,7 +203,8 @@ function showResult() {
         </form>
         <p class="privacy-note">We only use your email to contact you about fostering.</p>
         <p class="result-message" role="status"></p>
-      </div>`;
+      </div>
+      <button class="result-back" type="button" data-result-back>← Review previous answer</button>`;
 
     const resultForm = quizResult.querySelector('#result-email-form');
     resultForm.addEventListener('submit', event => {
@@ -104,16 +215,27 @@ function showResult() {
   } else {
     quizResult.innerHTML = `
       <h2>We’re sorry</h2>
-      <p>You do not meet the criteria to be a foster family</p>
+      <p>Based on your answers, some foster requirements are not currently met.</p>
       <div class="result-card">
-        <h3>But here are some things you can do anyway to help us and our animals ;)</h3>
+        <h3>Why this result</h3>
+        <ul class="failure-reasons">
+          ${failedReasons.map(reason => `<li>${reason}</li>`).join('')}
+        </ul>
+        <p class="result-alternatives">You can still help animals in other ways:</p>
         <div class="result-actions">
           <a href="https://www.dyrenesbeskyttelse.dk/stoet-dyrene">Make a donation</a>
           <a href="https://www.dyrenesbeskyttelse.dk/bliv-frivillig">Become a volunteer</a>
           <a href="https://www.dyrenesbeskyttelse.dk/adopter-et-dyr">Adopt an animal</a>
         </div>
-      </div>`;
+      </div>
+      <button class="result-back" type="button" data-result-back>← Review previous answer</button>`;
   }
+
+  quizResult.querySelector('[data-result-back]').addEventListener('click', () => {
+    currentQuestion = questions.length - 1;
+    renderQuestion();
+    questionText.focus({ preventScroll: true });
+  });
 
   const resultHeading = quizResult.querySelector('h2');
   resultHeading.tabIndex = -1;
@@ -135,11 +257,12 @@ document.querySelectorAll('[data-open-quiz]').forEach(button => {
 function updatePage() {
   const surveyOpen = window.location.hash === '#survey';
   document.querySelector('#main').hidden = surveyOpen;
-  document.querySelector('body > .site-header').hidden = surveyOpen;
+  const headerLogo = document.querySelector('.site-header .wordmark');
+  headerLogo.href = surveyOpen ? '#' : 'https://www.dyrenesbeskyttelse.dk/';
+  headerLogo.setAttribute('aria-label', surveyOpen ? 'Return to landing page' : 'Dyrenes Beskyttelse home');
   document.querySelector('.site-footer').hidden = surveyOpen;
   document.querySelector('.skip-link').hidden = surveyOpen;
-  mobileMenu.hidden = true;
-  menuButton.setAttribute('aria-expanded', 'false');
+  closeNavigation();
   quizPage.hidden = !surveyOpen;
   if (surveyOpen) {
     resetQuiz();
@@ -151,7 +274,8 @@ window.addEventListener('hashchange', updatePage);
 
 document.querySelectorAll('[data-answer]').forEach(button => {
   button.addEventListener('click', () => {
-    answers[currentQuestion] = button.dataset.answer;
+    const requiredAnswer = questions[currentQuestion].qualifyingAnswer;
+    answers[currentQuestion] = requiredAnswer === null || button.dataset.answer === requiredAnswer;
     if (currentQuestion === questions.length - 1) {
       showResult();
     } else {
@@ -160,6 +284,13 @@ document.querySelectorAll('[data-answer]').forEach(button => {
       questionText.focus({ preventScroll: true });
     }
   });
+});
+
+quizBack.addEventListener('click', () => {
+  if (currentQuestion === 0) return;
+  currentQuestion -= 1;
+  renderQuestion();
+  questionText.focus({ preventScroll: true });
 });
 
 updatePage();

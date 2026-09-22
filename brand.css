@@ -1,0 +1,137 @@
+/* Brand layer: live Dyrenes Beskyttelse reference, September 2026.
+   Layout and content remain in styles.css. Fonts require an appropriate web licence. */
+@font-face { font-family: 'GT Pressura Extended'; src: url('assets/fonts/GT-Pressura-Extended-Regular.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'GT Pressura Extended'; src: url('assets/fonts/GT-Pressura-Extended-Medium.woff2') format('woff2'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'GT Pressura Extended'; src: url('assets/fonts/GT-Pressura-Extended-Bold.woff2') format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
+:root {
+  --red: #a00000;
+  --bright-red: #a00000;
+  --survey-red: #a00000;
+  --dark-red: #7e0d00;
+  --orange: #ff503c;
+  --cream: #f5f0e6;
+  --paper: #fafafa;
+  --ink: #141414;
+  --muted: #463930;
+  --footer-text: #f5f0e6;
+  --brand-font: 'GT Pressura Extended', Arial, sans-serif;
+  --survey-font: var(--brand-font);
+  --header-height: 96px;
+}
+body { font-family: var(--brand-font); font-size: 17px; line-height: 1.4; letter-spacing: .3px; }
+h1, h2, h3 { letter-spacing: -.5px; }
+.hero h1 { font-size: clamp(36px, 3vw, 48px); line-height: 1.1; text-transform: uppercase; }
+.section h2 { font-size: clamp(28px, 2.5vw, 36px); line-height: 1.1; }
+.hero-intro, .fact-card > p:last-child, .faq-intro > p:last-child, .accordion details > p, .application-heading > p:last-child { font-size: 17px; line-height: 24px; }
+.fact-card h3 { font-size: 24px; line-height: 1.1; }
+.accordion details[open] summary { font-family: var(--brand-font); }
+.hero { color: var(--cream); }
+.hero .eyebrow { color: var(--cream); }
+.pill-button, .quiz-ribbon, .primary-button, .jump-links a { border-radius: 0; font-size: 16px; font-weight: 500; text-transform: uppercase; letter-spacing: 0; }
+.pill-button.coral { font-size: 16px; font-weight: 500; letter-spacing: 0; padding: 16px 24px; }
+.quiz-ribbon, .primary-button { padding: 16px 24px; line-height: 16px; }
+.jump-links a { border: 2px solid var(--cream); padding: 14px 20px; }
+.primary-button { color: var(--cream); }
+.support-button:hover, .pill-button.coral:hover, .quiz-ribbon:hover { background: #ff6a58; }
+.primary-button:hover { background: var(--dark-red); }
+.brand-container { width: min(1600px, 100%); padding-inline: 40px; margin-inline: auto; }
+
+/* One shared header for the landing page and survey. */
+.site-header { min-height: var(--header-height); padding: 24px 40px; gap: 20px; grid-template-columns: minmax(0, 1fr) 140px minmax(0, 1fr); background: var(--cream); }
+.main-nav { flex-wrap: nowrap; gap: 16px; }
+.main-nav > a, .nav-dropdown summary { font-size: 15px; font-weight: 400; line-height: 20.25px; text-transform: uppercase; white-space: nowrap; letter-spacing: 0; }
+.wordmark { color: var(--red); }
+.site-header > .wordmark { grid-column: 2; }
+.wordmark svg { display: block; width: 140px; height: 40px; fill: currentColor; }
+.header-actions { grid-column: 3; gap: 32px; }
+.support-button { padding: 16px 24px; font-size: 16px; font-weight: 500; line-height: 16px; letter-spacing: 0; white-space: nowrap; }
+.language { font-size: 14px; line-height: 20px; gap: 6px; color: var(--muted); }
+.language strong { border-bottom-width: 1px; font-weight: 500; }
+.mobile-label { display: none; }
+.nav-dropdown { position: relative; }
+.nav-dropdown summary { list-style: none; }
+.nav-dropdown summary::-webkit-details-marker { display: none; }
+.nav-dropdown summary::after { content: ''; display: inline-block; width: 5px; height: 5px; margin: 0 0 3px 6px; border-right: 1px solid; border-bottom: 1px solid; transform: rotate(45deg); }
+.nav-dropdown[open] summary::after { transform: rotate(225deg); margin-bottom: 0; }
+.nav-dropdown > div { position: absolute; top: calc(100% + 24px); left: -20px; min-width: 240px; display: grid; padding: 12px 20px; gap: 4px; background: var(--cream); box-shadow: 0 8px 12px #14141420; }
+.nav-dropdown a { padding: 10px 0; font-size: 15px; white-space: normal; text-transform: none; }
+.main-nav a:hover, .nav-dropdown summary:hover, .mobile-menu a:hover { color: var(--red); }
+.menu-toggle { display: none; }
+.application-brand .wordmark svg { width: min(280px, 100%); height: auto; aspect-ratio: 335.6 / 95.4; }
+
+/* Reference footer: red newsletter strip, darker information strip. */
+.site-footer { padding: 0; border: 0; color: var(--footer-text); background: var(--dark-red); }
+.footer-top { background: var(--red); color: #fff; padding-block: 48px; }
+.footer-top-grid, .footer-grid { display: grid; grid-template-columns: minmax(0, 58fr) minmax(0, 42fr); gap: 0; }
+.footer-emblem { width: 200px; height: 200px; fill: currentColor; align-self: center; }
+.footer-newsletter, .site-footer .contact { padding-left: min(7vw, 120px); }
+.site-footer .footer-newsletter h2 { font-size: 36px; line-height: 1.1; margin: 0 0 24px; text-transform: none; }
+.site-footer .newsletter-button { display: inline-block; padding: 14px 22px; border: 2px solid currentColor; font-size: 16px; font-weight: 500; line-height: 20px; }
+.newsletter-button:hover { background: var(--cream); color: var(--red); }
+.footer-newsletter p { font-size: 12px; line-height: 1.2; margin: 24px 0 0; }
+.footer-bottom { padding-block: 48px; }
+.footer-navigation { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.site-footer section { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
+.site-footer h2 { font-size: 18px; line-height: 1.4; margin: 0; }
+.site-footer a { font-size: 14px; line-height: 1.4; }
+.site-footer a:hover { text-decoration: underline; }
+.site-footer .contact { grid-column: auto; gap: 6px; font-size: 12px; line-height: 18px; }
+.contact > a, .contact p a { font-size: inherit; line-height: inherit; }
+.contact .membership { margin-top: 26px; }
+.socials { margin: 30px 0 0 -10px; display: flex; gap: 16px; }
+.socials a, .socials a:first-child { width: 50px; height: 50px; background: none; color: inherit; border-radius: 0; }
+.socials svg { width: 50px; height: 50px; fill: currentColor; }
+.socials a:first-child svg, .socials a:last-child svg { padding: 12px; }
+
+.quiz-page { background: var(--paper); }
+.quiz-content, .quiz-result { min-height: calc(100svh - var(--header-height)); }
+.quiz-title h2, .quiz-result h2, .quiz-answers button { font-weight: 700; }
+.question-card, .result-card { background: var(--dark-red); color: var(--cream); }
+.result-actions a { background: var(--cream); color: var(--ink); font-weight: 500; text-transform: uppercase; }
+.result-email button { background: var(--coral); color: var(--ink); font-weight: 500; }
+.privacy-note { color: var(--cream); }
+
+/* English labels are longer than the Danish reference navigation. */
+@media (min-width: 1400px) and (max-width: 1699px) {
+  .main-nav { gap: 10px; }
+  .main-nav > a, .nav-dropdown summary { font-size: 12.5px; }
+}
+
+@media (max-width: 1399px) {
+  :root { --header-height: 70px; }
+  .site-header { min-height: 70px; padding: 14px 24px; grid-template-columns: minmax(0, 1fr) 88px minmax(0, 1fr); gap: 16px; }
+  .main-nav { display: none; }
+  .site-header > .wordmark { grid-column: 2; grid-row: 1; }
+  .site-header .wordmark svg { width: 88px; height: 25px; }
+  body > .site-header .header-actions { display: none; }
+  .header-actions .language, .desktop-label { display: none; }
+  .mobile-label { display: inline; }
+  .support-button { padding: 11px 24px; }
+  .menu-toggle { display: flex; flex-direction: column; justify-content: center; gap: 5px; width: 44px; height: 40px; padding: 10px; border: 0; background: none; color: var(--ink); grid-column: 3; grid-row: 1; justify-self: end; }
+  .menu-toggle span { width: 24px; height: 2px; background: currentColor; }
+  .menu-toggle[aria-expanded='true'] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .menu-toggle[aria-expanded='true'] span:nth-child(2) { opacity: 0; }
+  .menu-toggle[aria-expanded='true'] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+  .mobile-menu { position: absolute; z-index: 19; inset-inline: 0; top: 70px; padding: 24px; background: var(--cream); box-shadow: 0 12px 28px #14141420; max-height: calc(100svh - 70px); overflow-y: auto; }
+  .mobile-menu:not([hidden]) { display: flex; flex-direction: column; gap: 20px; }
+  .mobile-menu a { font-size: 17px; font-weight: 400; text-decoration: none; text-transform: uppercase; }
+}
+@media (max-width: 900px) {
+  .brand-container { padding-inline: 24px; }
+  .footer-top-grid, .footer-grid { grid-template-columns: minmax(0, 1fr); }
+  .footer-emblem { justify-self: center; margin-bottom: 48px; }
+  .footer-newsletter, .site-footer .contact { padding-left: 0; }
+  .site-footer .footer-newsletter h2 { font-size: 28px; }
+  .site-footer .contact { margin-top: 48px; }
+}
+@media (max-width: 620px) {
+  .site-header { padding-inline: 16px; gap: 8px; }
+  .support-button { padding-inline: 16px; }
+  .brand-container { padding-inline: 24px; }
+  .footer-navigation { grid-template-columns: minmax(0, 1fr); gap: 48px; }
+  .site-footer h2 { font-size: 16px; }
+  .site-footer .footer-newsletter h2 { font-size: 20px; }
+  .site-footer .contact { align-items: center; text-align: center; }
+  .socials { margin-left: 0; }
+  .hero h1 { font-size: 36px; }
+}
