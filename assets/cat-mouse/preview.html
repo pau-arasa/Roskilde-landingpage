@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Cat & mouse — animation preview</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#fafafa;color:#463930;font:16px/1.5 Arial,sans-serif}main{max-width:1344px;margin:64px auto;padding:24px}h1{color:#7e0d00;font-size:30px;line-height:1.2}.stage{margin:32px 0;background:#f5f0e6;border:1px solid #d8cec0}.stage video{display:block;width:100%;height:auto}button,a{font:inherit}button{cursor:pointer;background:#a00000;color:#f5f0e6;padding:12px 24px;border:0}a{color:#a00000}.header-sample{margin-top:40px;display:flex;align-items:center;gap:32px;background:#f5f0e6;padding:8px 24px;min-height:96px}.header-sample video{width:45%;max-height:96px;object-fit:contain}.logo{font-size:16px;color:#a00000;text-align:center;line-height:1.1;letter-spacing:2px;font-weight:bold}.details{font-size:14px;color:#796b60}.checker{background-color:white;background-image:linear-gradient(45deg,#ddd 25%,transparent 25%),linear-gradient(-45deg,#ddd 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#ddd 75%),linear-gradient(-45deg,transparent 75%,#ddd 75%);background-size:20px 20px;background-position:0 0,0 10px,10px -10px,-10px 0}@media(prefers-reduced-motion:reduce){.motion-note{display:block}}
+</style></head><body><main>
+<h1>A little chase. A little confusion. A well-earned nap.</h1>
+<p>Blender animation · 10 seconds · 24 fps · transparent background</p>
+<div class="stage" id="stage"><video id="main-video" src="cat-mouse-header.webm" poster="sleeping-poster.png" muted playsinline controls preload="auto"></video></div>
+<button id="replay">Play / replay</button> <button id="background">Show transparency</button>
+<p class="details">Plays once and ends with the sleeping cat. The animation is intentionally not a seamless loop.</p>
+<h2>At header size</h2><div class="header-sample"><video id="header-video" src="cat-mouse-header.webm" poster="sleeping-poster.png" muted playsinline preload="auto"></video><span class="logo">DYRENES<br>BESKYTTELSE</span></div>
+<p><a href="cat-mouse-header.blend" download>Blender scene</a> · <a href="cat-mouse-header.webm" download>Transparent WebM</a> · <a href="cat-mouse-preview.mp4" download>MP4 preview</a> · <a href="storyboard.jpg">Storyboard</a></p>
+<script>
+const videos=[...document.querySelectorAll('video')];
+document.querySelector('#replay').addEventListener('click',()=>videos.forEach(v=>{v.currentTime=0;v.play();}));
+document.querySelector('#background').addEventListener('click',()=>document.querySelector('#stage').classList.toggle('checker'));
+if(!matchMedia('(prefers-reduced-motion: reduce)').matches){videos.forEach(v=>v.play().catch(()=>{}));}
+</script></main></body></html>
