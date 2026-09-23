@@ -1,0 +1,87 @@
+/* ---------- Quiz → application handoff: shared pieces ---------- */
+.quiz-page .result-card h3 { font-size: 24px; line-height: 1.3; }
+.handoff { margin-top: 32px; padding-top: 28px; border-top: 1px solid rgba(246, 243, 239, .18); }
+.handoff-button {
+  width: 100%;
+  padding: 20px 28px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--cream);
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+  text-transform: uppercase;
+}
+.handoff-button:hover, .handoff-button:focus-visible { background: var(--coral); color: var(--ink); }
+.handoff p { margin: 14px 0 0; color: rgba(246, 243, 239, .8); font-size: 14px; line-height: 1.45; text-align: center; }
+.quiz-page .result-alternatives { margin: 32px 0 12px; font-size: 15px; }
+.result-links { display: flex; flex-wrap: wrap; gap: 10px; }
+.result-links a {
+  padding: 12px 18px;
+  border: 1.5px solid rgba(246, 243, 239, .55);
+  border-radius: 999px;
+  color: var(--cream);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background-color .18s ease, color .18s ease, border-color .18s ease;
+}
+.result-links a:hover, .result-links a:focus-visible { border-color: var(--cream); background: var(--cream); color: var(--dark-red); }
+.is-not-match .failure-reasons { margin-top: 20px; }
+
+/* Fields that were just filled from the quiz get a short highlight. */
+@keyframes just-filled {
+  0%, 35% { box-shadow: 0 0 0 4px rgba(255, 80, 60, .45); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 80, 60, 0); }
+}
+.just-filled { animation: just-filled 1.8s ease-out 1; }
+
+@media (max-width: 800px) {
+  .quiz-page .result-card { text-align: left; }
+}
+@media (max-width: 520px) {
+  .result-links { flex-direction: column; }
+  .handoff-button { padding: 18px 20px; font-size: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .just-filled { animation: none; }
+  .result-links a { transition: none; }
+}
+
+/* ---------- Alternative A: summary on the result screen, pre-filled message in the form ---------- */
+.summary-label { margin: 24px 0 10px; color: rgba(246, 243, 239, .7); font-size: 13px; font-weight: 500; letter-spacing: 1.2px; text-transform: uppercase; }
+.type-chips { margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; list-style: none; }
+.type-chips li { padding: 8px 14px; border-radius: 999px; background: var(--coral); color: var(--ink); font-size: 15px; font-weight: 500; line-height: 1.2; }
+.fact-list { margin: 0; padding: 0; display: grid; gap: 8px; list-style: none; }
+.fact-list li { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 10px; align-items: start; font-size: 15px; line-height: 1.4; }
+.fact-icon { width: 20px; height: 20px; color: var(--coral); }
+
+/* Landing page form */
+.prefill-note {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  background: var(--soft-red);
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.4;
+}
+.prefill-note:focus { outline: none; }
+.prefill-note:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.prefill-note svg { width: 28px; height: 28px; color: var(--red); }
+.prefill-note strong { display: block; font-weight: 700; }
+.prefill-note span { color: var(--muted); }
+.prefill-retake { color: var(--red); font-size: 14px; font-weight: 500; white-space: nowrap; text-underline-offset: 3px; }
+@media (max-width: 620px) {
+  .prefill-note { grid-template-columns: 24px minmax(0, 1fr); align-items: start; }
+  .prefill-note svg { width: 24px; height: 24px; }
+  .prefill-retake { grid-column: 2; }
+}

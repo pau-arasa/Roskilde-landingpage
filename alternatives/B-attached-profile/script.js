@@ -220,8 +220,8 @@ const FOSTER_TYPES = [
     // Needs round-the-clock feeding and newborn care.
     check: a => {
       const missing = [];
-      if (a[7] !== 'yes') missing.push('feeding every 3 hours, day and night');
-      if (a[8] !== 'yes') missing.push('hands-on newborn care');
+      if (a[7] !== 'yes') missing.push('needs feeding every 3 hours, day and night');
+      if (a[8] !== 'yes') missing.push('needs hands-on newborn care');
       return missing;
     }
   },
@@ -229,7 +229,7 @@ const FOSTER_TYPES = [
     value: 'Motherless kittens',
     phrase: 'motherless kittens',
     short: '4–12 weeks old, socialising and care.',
-    check: a => (a[2] !== 'yes' ? ['daily time for socialising'] : [])
+    check: a => (a[2] !== 'yes' ? ['needs daily time for socialising'] : [])
   },
   {
     value: 'Cat with kittens',
@@ -237,8 +237,8 @@ const FOSTER_TYPES = [
     short: 'A mother and her litter. No other pets, own room.',
     check: a => {
       const missing = [];
-      if (a[0] === 'yes') missing.push('a home without other animals');
-      if (a[6] !== 'yes') missing.push('a separate, quiet room');
+      if (a[0] === 'yes') missing.push('needs a home without other animals');
+      if (a[6] !== 'yes') missing.push('needs a separate, quiet room');
       return missing;
     }
   }
@@ -352,66 +352,6 @@ function joinTypes(values) {
   return `${lower.slice(0, -1).join(', ')} and ${lower.at(-1)}`;
 }
 
-/* Keep the question card the same size for all 10 questions, so the progress
-   bar, Back link and answer buttons never move. The card takes the height of
-   the tallest question; if the quiz would then overflow the screen, the
-   question text is scaled down step by step until everything fits. */
-const questionCard = document.querySelector('.question-card');
-const MIN_QUESTION_SCALE = 0.75;
-let questionCardSizedFor = '';
-
-function measureTallestQuestion() {
-  const probe = questionCard.cloneNode(true);
-  probe.querySelectorAll('[id]').forEach(element => element.removeAttribute('id'));
-  probe.removeAttribute('aria-live');
-  probe.setAttribute('aria-hidden', 'true');
-  Object.assign(probe.style, {
-    position: 'absolute',
-    top: '0',
-    left: '0',
-    width: `${questionCard.getBoundingClientRect().width}px`,
-    height: 'auto',
-    visibility: 'hidden',
-    pointerEvents: 'none'
-  });
-  questionCard.after(probe);
-  const count = probe.querySelector('.question-count');
-  const title = probe.querySelector('h3');
-  const help = probe.querySelector('h3 + p');
-  let tallest = 0;
-  questions.forEach((question, index) => {
-    count.textContent = `${index + 1}/10`;
-    title.textContent = question.text;
-    help.textContent = question.help || '';
-    help.hidden = !question.help;
-    tallest = Math.max(tallest, probe.getBoundingClientRect().height);
-  });
-  probe.remove();
-  return Math.ceil(tallest);
-}
-
-function sizeQuestionCard(force = false) {
-  if (quizPage.hidden || quizContent.hidden) return;
-  const viewport = `${window.innerWidth}x${window.innerHeight}`;
-  if (!force && viewport === questionCardSizedFor) return;
-  questionCardSizedFor = viewport;
-  let scale = 1;
-  for (;;) {
-    quizPage.style.setProperty('--question-scale', scale);
-    questionCard.style.height = `${measureTallestQuestion()}px`;
-    const overflow = document.documentElement.scrollHeight - window.innerHeight;
-    if (overflow <= 0 || scale <= MIN_QUESTION_SCALE) break;
-    scale = Math.max(MIN_QUESTION_SCALE, Math.round((scale - 0.05) * 100) / 100);
-  }
-}
-
-let questionResizeFrame = 0;
-window.addEventListener('resize', () => {
-  cancelAnimationFrame(questionResizeFrame);
-  questionResizeFrame = requestAnimationFrame(() => sizeQuestionCard());
-});
-document.fonts?.ready.then(() => sizeQuestionCard(true));
-
 let currentQuestion = 0;
 let answers = [];
 
@@ -422,31 +362,25 @@ function renderQuestion() {
   questionText.textContent = questions[currentQuestion].text;
   questionHelp.textContent = questions[currentQuestion].help || '';
   questionHelp.hidden = !questionHelp.textContent;
-  // Hidden with visibility (not display) so the answer buttons never shift.
-  quizBack.style.visibility = currentQuestion === 0 ? 'hidden' : '';
+  quizBack.hidden = currentQuestion === 0;
   progress.replaceChildren(...questions.map((_, index) => {
     const step = document.createElement('span');
     if (index <= currentQuestion) step.className = 'done';
     return step;
   }));
-  sizeQuestionCard();
 }
 
-/* Result screen: pick the foster types to apply for, then hand off to the
-   landing page application form with a pre-written message. */
-function buildMessage(profile, chosenTypes) {
-  const lines = ['Hi cat team,', ''];
-  lines.push(chosenTypes.length
-    ? `I took the foster quiz and I’m interested in fostering ${joinTypes(chosenTypes)}.`
-    : 'I took the foster quiz and I’m interested in fostering.');
-  if (profile.flagged.length) {
-    lines.push('', 'Things I’d like to discuss:');
-    profile.flagged.forEach(fact => lines.push(`• ${fact.sentence}`));
-  }
-  lines.push('', profile.flagged.length ? 'My other answers:' : 'About my situation:');
-  profile.facts.filter(fact => !fact.flagged).forEach(fact => lines.push(`• ${fact.sentence}`));
-  lines.push('', '');
-  return lines.join('\n');
+/* ---------- Alternative B: quiz profile travels with the application as an attachment ---------- */
+function profileSheet(profile, compact = false) {
+  return `<dl class="profile-sheet${compact ? ' is-compact' : ''}">${profile.facts.map(fact => `
+    <div class="${fact.flagged ? 'is-flagged' : ''}">
+      <dt>${fact.label}</dt>
+      <dd><span class="answer-pill answer-${fact.answer}">${fact.answer === 'yes' ? 'Yes' : 'No'}</span>${fact.flagged ? '<span class="discuss-tag">To discuss</span>' : ''}</dd>
+    </div>`).join('')}</dl>`;
+}
+
+function profileAsText(profile) {
+  return profile.facts.map(fact => `${fact.label}: ${fact.answer === 'yes' ? 'Yes' : 'No'}${fact.flagged ? ' (to discuss)' : ''}`).join('\n');
 }
 
 function showResult() {
@@ -456,76 +390,90 @@ function showResult() {
   quizResult.classList.toggle('is-match', profile.isMatch);
   quizResult.classList.toggle('is-not-match', !profile.isMatch);
 
-  const typeCards = profile.types.map(type => `
-    <label class="match-card ${type.fits ? 'fits' : 'no-fit'}">
-      <input type="checkbox" name="result-type" value="${type.value}" ${type.fits ? 'checked' : ''}>
-      <span class="match-box" aria-hidden="true"></span>
-      <span class="match-body">
-        <strong>${type.value}</strong>
-        <small>${type.short}</small>
-        <span class="match-note">${type.fits
-          ? `${checkIcon}<span>Matches your answers</span>`
-          : `${reasonIcon}<span><span class="sr-only">To discuss: </span>Needs ${type.missing.join(' and ')}</span>`}</span>
-      </span>
-    </label>`).join('');
+  const suggestion = profile.suggestedTypes.length
+    ? `<p class="profile-suggestion"><span>Suits you</span>${profile.suggestedTypes.map(type => `<strong>${type}</strong>`).join('')}</p>`
+    : '';
 
-  quizResult.innerHTML = `
-      <h2>${profile.isMatch ? 'Talk to the cat team' : 'Let’s discuss your setup'}</h2>
-      <p>${profile.isMatch
-        ? 'Your answers are a starting point, not approval for a placement. Pick the foster types you’d like to talk about.'
-        : 'Your answers raise some points to discuss with the shelter. This quiz is guidance, not a final assessment.'}</p>
-      <div class="result-card match-panel">
-        ${profile.isMatch ? '' : `
-        <h3>Points to discuss</h3>
+  quizResult.innerHTML = profile.isMatch
+    ? `
+      <h2>Talk to the cat team</h2>
+      <p>Your answers are a starting point, not approval for a placement. Foster-type requirements still need to be discussed.</p>
+      <div class="result-card profile-card">
+        <div class="profile-card-head"><h3>Your foster profile</h3><span>10/10 answered</span></div>
+        ${suggestion}
+        ${profileSheet(profile)}
+        <div class="handoff">
+          <button class="handoff-button" type="button" data-handoff>Apply with this profile →</button>
+          <p>Your profile is attached to the application, so you only need to add your contact details.</p>
+        </div>
+      </div>
+      <button class="result-back" type="button" data-result-back>← Review previous answer</button>`
+    : `
+      <h2>Let’s discuss your setup</h2>
+      <p>Your answers raise some points to discuss with the shelter. This quiz is guidance, not a final assessment.</p>
+      <div class="result-card profile-card">
+        <div class="profile-card-head"><h3>Your foster profile</h3><span>${profile.flagged.length} to discuss</span></div>
         <ul class="failure-reasons">
           ${profile.flagged.map(fact => `<li>${reasonIcon}<span>${fact.reason}</span></li>`).join('')}
-        </ul>`}
-        <fieldset class="match-fieldset">
-          <legend>${profile.isMatch ? 'Which foster type interests you?' : 'Which foster type would you like to ask about?'}</legend>
-          <div class="match-grid">${typeCards}</div>
-        </fieldset>
+        </ul>
         <div class="handoff">
-          <button class="handoff-button" type="button" data-handoff></button>
-          <p>We’ll write your answers into the application message. You can change anything before you send it.</p>
+          <button class="handoff-button" type="button" data-handoff>Ask the cat team →</button>
+          <p>Your profile is attached to the message, so the team can see your situation.</p>
         </div>
-        ${profile.isMatch ? '' : otherWaysToHelp}
+        ${otherWaysToHelp}
       </div>
       <button class="result-back" type="button" data-result-back>← Review previous answer</button>`;
 
-  const handoffButton = quizResult.querySelector('[data-handoff]');
-  const chosen = () => [...quizResult.querySelectorAll('input[name="result-type"]:checked')].map(input => input.value);
-  const updateButton = () => {
-    const types = chosen();
-    handoffButton.textContent = types.length === 1
-      ? `Apply for ${types[0].toLowerCase()} →`
-      : types.length > 1 ? `Apply for ${types.length} foster types →` : (profile.isMatch ? 'Continue to application →' : 'Ask the cat team →');
-  };
-  quizResult.querySelectorAll('input[name="result-type"]').forEach(input => input.addEventListener('change', updateButton));
-  updateButton();
-
-  handoffButton.addEventListener('click', () => {
-    const types = chosen();
-    goToApplication(() => prefillApplication(profile, types));
+  quizResult.querySelector('[data-handoff]').addEventListener('click', () => {
+    goToApplication(() => attachProfile(profile));
   });
   finishResult();
 }
 
-function prefillApplication(profile, chosenTypes) {
-  setFosterTypes(chosenTypes);
-  const textarea = fillSetup(buildMessage(profile, chosenTypes));
-  const field = textarea.closest('.field');
-  let badge = field.querySelector('.prefill-badge');
-  if (!badge) {
-    badge = document.createElement('em');
-    badge.className = 'prefill-badge';
-    field.querySelector('small').after(badge);
-  }
-  badge.innerHTML = 'Written from your quiz answers – edit freely. <a href="#survey">Retake quiz</a>';
+const setupField = applicationForm.elements.setup;
+const setupHint = setupField.closest('.field').querySelector('small');
+const setupHintDefault = setupHint.textContent;
 
-  const heading = document.querySelector('.application-heading h2');
-  heading.tabIndex = -1;
-  flash([...applicationForm.querySelectorAll('.choice-card:has(input:checked)'), textarea]);
-  landOnApplication(heading);
+function attachProfile(profile) {
+  setFosterTypes(profile.suggestedTypes);
+  applicationForm.querySelector('.attached-profile')?.remove();
+
+  const block = document.createElement('section');
+  block.className = 'attached-profile full-row';
+  block.tabIndex = -1;
+  block.setAttribute('aria-label', 'Your quiz profile, attached to this application');
+  block.innerHTML = `
+    <div class="attached-head">
+      <span class="attached-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M8 12.5l6.4-6.4a3 3 0 0 1 4.2 4.2l-8.1 8.1a5 5 0 0 1-7-7L11 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+      <div>
+        <p class="attached-title">Quiz profile attached</p>
+        <p class="attached-sub">${profile.isMatch ? 'The cat team will see these answers with your application.' : `The cat team will see your answers and the ${profile.flagged.length === 1 ? 'point' : 'points'} to discuss.`}</p>
+      </div>
+      <div class="attached-actions">
+        <a href="#survey">Edit answers</a>
+        <button type="button" data-remove-profile>Remove</button>
+      </div>
+    </div>
+    <details class="attached-details">
+      <summary>Show the 10 answers</summary>
+      ${profileSheet(profile, true)}
+    </details>
+    <input type="hidden" name="quiz-profile" value="">`;
+  block.querySelector('input[name="quiz-profile"]').value = profileAsText(profile);
+  applicationForm.prepend(block);
+
+  setupField.required = false;
+  setupHint.textContent = 'Optional. Your quiz profile already covers the basics – add anything else the cat team should know.';
+
+  block.querySelector('[data-remove-profile]').addEventListener('click', () => {
+    block.remove();
+    setupField.required = true;
+    setupHint.textContent = setupHintDefault;
+    applicationForm.querySelector('input[name="foster-type"]').focus();
+  });
+
+  flash([block, ...applicationForm.querySelectorAll('.choice-card:has(input:checked)')]);
+  landOnApplication(block);
 }
 
 function resetQuiz() {

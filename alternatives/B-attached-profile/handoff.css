@@ -1,0 +1,97 @@
+/* ---------- Quiz → application handoff: shared pieces ---------- */
+.quiz-page .result-card h3 { font-size: 24px; line-height: 1.3; }
+.handoff { margin-top: 32px; padding-top: 28px; border-top: 1px solid rgba(246, 243, 239, .18); }
+.handoff-button {
+  width: 100%;
+  padding: 20px 28px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--cream);
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+  text-transform: uppercase;
+}
+.handoff-button:hover, .handoff-button:focus-visible { background: var(--coral); color: var(--ink); }
+.handoff p { margin: 14px 0 0; color: rgba(246, 243, 239, .8); font-size: 14px; line-height: 1.45; text-align: center; }
+.quiz-page .result-alternatives { margin: 32px 0 12px; font-size: 15px; }
+.result-links { display: flex; flex-wrap: wrap; gap: 10px; }
+.result-links a {
+  padding: 12px 18px;
+  border: 1.5px solid rgba(246, 243, 239, .55);
+  border-radius: 999px;
+  color: var(--cream);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background-color .18s ease, color .18s ease, border-color .18s ease;
+}
+.result-links a:hover, .result-links a:focus-visible { border-color: var(--cream); background: var(--cream); color: var(--dark-red); }
+.is-not-match .failure-reasons { margin-top: 20px; }
+
+/* Fields that were just filled from the quiz get a short highlight. */
+@keyframes just-filled {
+  0%, 35% { box-shadow: 0 0 0 4px rgba(255, 80, 60, .45); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 80, 60, 0); }
+}
+.just-filled { animation: just-filled 1.8s ease-out 1; }
+
+@media (max-width: 800px) {
+  .quiz-page .result-card { text-align: left; }
+}
+@media (max-width: 520px) {
+  .result-links { flex-direction: column; }
+  .handoff-button { padding: 18px 20px; font-size: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .just-filled { animation: none; }
+  .result-links a { transition: none; }
+}
+
+/* ---------- Alternative B: quiz profile attached to the application ---------- */
+.profile-card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.profile-card-head span { color: rgba(246, 243, 239, .7); font-size: 13px; font-weight: 500; letter-spacing: 1.2px; text-transform: uppercase; }
+.profile-suggestion { margin: 20px 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.profile-suggestion span { margin-right: 4px; color: rgba(246, 243, 239, .7); font-size: 13px; font-weight: 500; letter-spacing: 1.2px; text-transform: uppercase; }
+.profile-suggestion strong { padding: 7px 14px; border-radius: 999px; background: var(--coral); color: var(--ink); font-size: 14px; font-weight: 500; line-height: 1.2; }
+
+.profile-sheet { margin: 20px 0 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 28px; }
+.profile-sheet > div { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 0; border-bottom: 1px solid rgba(246, 243, 239, .16); }
+.profile-sheet dt { font-size: 15px; line-height: 1.3; }
+.profile-sheet dd { margin: 0; display: flex; flex-shrink: 0; gap: 6px; }
+.answer-pill, .discuss-tag { padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 500; line-height: 1.2; letter-spacing: .6px; text-transform: uppercase; }
+.answer-yes { background: var(--cream); color: var(--ink); }
+.answer-no { box-shadow: inset 0 0 0 1.5px rgba(246, 243, 239, .6); color: var(--cream); }
+.discuss-tag { background: var(--coral); color: var(--ink); }
+
+/* Attached profile inside the landing page form */
+.attached-profile { padding: 20px 24px; border: 1px solid var(--border); border-radius: 12px; background: var(--cream); }
+.attached-profile:focus { outline: none; }
+.attached-profile:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.attached-head { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; gap: 16px; }
+.attached-icon { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; background: var(--red); color: #fff; }
+.attached-icon svg { width: 22px; height: 22px; }
+.attached-title { margin: 0; font-size: 16px; font-weight: 700; line-height: 1.3; }
+.attached-sub { margin: 2px 0 0; color: var(--muted); font-size: 14px; line-height: 1.4; }
+.attached-actions { display: flex; align-items: center; gap: 16px; }
+.attached-actions a, .attached-actions button { padding: 0; border: 0; border-radius: 0; background: none; color: var(--red); font-size: 14px; font-weight: 500; text-decoration: underline; text-underline-offset: 3px; }
+.attached-actions button:hover { box-shadow: none; color: var(--dark-red); }
+.attached-details { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
+.attached-details summary { width: fit-content; color: var(--ink); font-size: 14px; font-weight: 500; }
+.profile-sheet.is-compact { margin-top: 8px; }
+.profile-sheet.is-compact > div { padding: 9px 0; border-bottom-color: var(--border); }
+.profile-sheet.is-compact dt { font-size: 14px; }
+.is-compact .answer-yes { background: var(--red); color: #fff; }
+.is-compact .answer-no { box-shadow: inset 0 0 0 1.5px var(--muted); color: var(--muted); }
+
+@media (max-width: 620px) {
+  .profile-sheet { grid-template-columns: minmax(0, 1fr); }
+  .attached-head { grid-template-columns: 40px minmax(0, 1fr); }
+  .attached-icon { width: 40px; height: 40px; }
+  .attached-actions { grid-column: 2; }
+}
